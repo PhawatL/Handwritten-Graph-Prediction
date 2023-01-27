@@ -19,7 +19,10 @@ class make_fuc:
         degree = self.degree
         for i in range(len(self.w)):
             s += ' +' if self.w[i] >0 else ' '
-            s += f'{round(self.w[i],6)}x^{degree}'
+            if degree == 0:
+                s += f'{round(self.w[i],6)}'
+            else:
+                s += f'{round(self.w[i],6)}x^{degree}'
             degree -=1
         
         
@@ -43,3 +46,6 @@ def diff_fuc(f,g,*,n=20):
     for i in range(n):
         diff = abs(f(i)-g(i))
     return diff/n
+
+if __name__ == '__main__':
+    print("don't run this file")
