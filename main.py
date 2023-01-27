@@ -51,46 +51,73 @@ def decrement_degree():
 
     degree_slider.set(upper_degree)
 
+    
 def get_coordinates():
     global upper_degree
     df = pd.DataFrame(coordinates,columns=['x','y'])
-    df['x']=df['x'] - 400
-    df['y']=rows-df['y'] + 300
+    df['x']=(df['x'] - 400)/50
+    df['y']=(rows-df['y'] + 300)/50
     
 
     df.to_csv('coordinates.csv',index=False)
     x = df['x'].to_numpy()
-# y = f(x)
+
     y = df['y'].to_numpy()
-    print(list(zip(x,y)))
+
 
     n = len(x)
     degree_upper = upper_degree
     degree_lower = 0
 
+    X = x**degree_upper
+
+    for i in range(degree_upper-1,degree_lower,-1):
+        X = np.vstack((X,(x)**i))
+    else:
+        X = np.vstack((X,np.ones(n)))
+   
+    X = X.T
+    W = np.linalg.inv(X.T @ X) @ X.T @ y
+    my_fuc = make_fuc(W,degree_upper)
+
+    print(f'predict fucntion : {my_fuc}')
+
+    
+def draw_graph():
+    global upper_degree
+    df = pd.DataFrame(coordinates,columns=['x','y'])
+    df['x']=(df['x'] - 400)/50
+    df['y']=(rows-df['y'] + 300)/50
+    
+
+    df.to_csv('coordinates.csv',index=False)
+    x = df['x'].to_numpy()
+
+    y = df['y'].to_numpy()
+
+    n = len(x)
+    degree_upper = upper_degree
+    degree_lower = 0
 
     plt.plot(x,y,'.r')
 
     X = x**degree_upper
 
     for i in range(degree_upper-1,degree_lower,-1):
-        X = np.vstack(((x)**i,X))
+        X = np.vstack((X,(x)**i))
     else:
         X = np.vstack((X,np.ones(n)))
    
     X = X.T
     W = np.linalg.inv(X.T @ X) @ X.T @ y
-    print(W)
     z = X @ W
     plt.scatter(x,z,s=50)
-    my_fuc = make_fuc(W,degree_upper)
-    # print(diff_fuc(my_fuc,f,n=100))
-    print(f'predict fucntion : {my_fuc}')
-    # plt.xlim((-10,10))
-    # plt.ylim((-10,10))
+    
     ax = plt.gca()
     ax.set_aspect('equal')
     plt.show()
+    
+
 def clear_canvas():
     canvas.delete("all")
     draw_grid(12,16)
@@ -108,8 +135,10 @@ frame = tk.Frame(root)
 frame.pack()
 
 #create the buttons
-get_coords_button = tk.Button(frame, text="Predict", command=get_coordinates)
-get_coords_button.pack(side=tk.LEFT)
+predict_button = tk.Button(frame, text="Predict", command=get_coordinates)
+predict_button.pack(side=tk.LEFT)
+draw_button = tk.Button(frame, text="Draw", command=draw_graph)
+draw_button.pack(side=tk.LEFT)
 clear_button = tk.Button(frame, text="Clear", command=clear_canvas)
 clear_button.pack(side=tk.LEFT)
 
